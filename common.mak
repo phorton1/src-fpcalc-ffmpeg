@@ -15,11 +15,26 @@ endif
 
 ifndef SUBDIR
 
+# 2015-07-24 prh My changes to common.mak are transparent
+# unless specific environment variables (MULTI-MAKE or
+# NO_WARNINGS) are defined.
+
+ifdef MULTI_MAKE
+	SHOWDIR=[$(notdir $(patsubst %/,%,$(dir $(CURDIR))))]
+endif
+
+
 ifndef V
 Q      = @
-ECHO   = printf "$(1)\t%s\n" $(2)
-BRIEF  = CC CXX HOSTCC HOSTLD AS YASM AR LD STRIP CP WINDRES
+ECHO   = printf "$(SHOWDIR) $(1)\t%s\n" $(2)
+BRIEF  = HOSTCC HOSTLD AS YASM AR CP WINDRES
 SILENT = DEPCC DEPHOSTCC DEPAS DEPYASM RANLIB RM
+
+
+ifndef NOISY
+BRIEF  += CC CXX LD STRIP
+endif
+
 
 MSG    = $@
 M      = @$(call ECHO,$(TAG),$@);
@@ -42,6 +57,12 @@ YASMFLAGS  += $(IFLAGS:%=%/) -Pconfig.asm
 
 HOSTCCFLAGS = $(IFLAGS) $(HOSTCPPFLAGS) $(HOSTCFLAGS)
 LDFLAGS    := $(ALLFFLIBS:%=$(LD_PATH)lib%) $(LDFLAGS)
+
+
+ifdef NO_WARNINGS
+CFLAGS     += -w  -Wno-deprecated-declarations
+endif
+
 
 define COMPILE
        $(call $(1)DEP,$(1))

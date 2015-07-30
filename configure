@@ -342,6 +342,8 @@ Advanced options (experts only):
                            (faster, but may crash)
   --enable-memalign-hack   emulate memalign, interferes with memory debuggers
   --sws-max-filter-size=N  the max filter size swscale uses [$sws_max_filter_size_default]
+  --enable-werrors         declare -Werror for implicit function declarations and missing prototypes [on]
+
 
 Optimization options (experts only):
   --disable-asm            disable all assembly optimizations
@@ -1534,6 +1536,7 @@ CONFIG_LIST="
     raise_major
     thumb
     valgrind_backtrace
+    werrors
     xmm_clobber_test
 "
 
@@ -2886,6 +2889,7 @@ enable safe_bitstream_reader
 enable static
 enable swscale_alpha
 enable valgrind_backtrace
+enable werrors
 
 sws_max_filter_size_default=256
 set_default sws_max_filter_size
@@ -5607,8 +5611,10 @@ elif enabled ccc; then
 elif enabled gcc; then
     check_optflags -fno-tree-vectorize
     check_cflags -Werror=format-security
-    check_cflags -Werror=implicit-function-declaration
-    check_cflags -Werror=missing-prototypes
+    if enabled werrors; then
+        check_cflags -Werror=implicit-function-declaration
+        check_cflags -Werror=missing-prototypes
+    fi
     check_cflags -Werror=return-type
     check_cflags -Werror=vla
     check_cflags -Wformat
