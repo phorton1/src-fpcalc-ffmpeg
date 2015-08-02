@@ -70,7 +70,7 @@ You will be creating a directory structure containing at least **ffmpeg** and **
 Use **git clone** to download a *full copy* of this repository and **check-out** the specific version you will be building:
 
 ```bash
-    git clone https://phorton1@bitbucket.org/phorton1/ffmpeg.git
+    git clone https://bitbucket.org/phorton1/ffmpeg.git
     cd /blah/fpcalc/ffmpeg
     git checkout multi-0.9
 ```
