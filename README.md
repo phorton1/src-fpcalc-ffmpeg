@@ -83,8 +83,8 @@ This will create the directory **/blah/fpcalc/ffmpeg**. In our example we will s
 
 Within a given version (checkout) you can configure and build one or more platforms using the **multi-configure** and **multi-make** shell scripts.
 
-### **multi-configure**
-takes *multiple parameters* from the list **all**, **win**, **x86**, **arm**, **arm7**, and **host**:
+#### multi-configure platform(s)
+takes *one or more parameters* from the list **all**, **win**, **x86**, **arm**, **arm7**, and **host**:
 
 - all = build all platforms
 - win = build for windows
@@ -95,11 +95,11 @@ takes *multiple parameters* from the list **all**, **win**, **x86**, **arm**, **
 
 The **host** build is used on linux to build the linux version of the ffmpeg libraries.  It is not available on Windows hosts, where you use **win** to build ffmpeg for Windows
 
-#### multi-make
+#### multi-make  platform \[make_options\]
 
-takes **one** of those parameters, along with additional optional "make" parameters like **clean**, **noisy**, and **install**.
+takes **one** *platform parameter*, along with additional optional "make" parameters like **clean**, **noisy**, and **install**.
 
-#### example: configure and build for armeabi-v7a
+#### a. example: configure and build for armeabi-v7a
 
 Assuming you are building on a Linux machine, if you
 
@@ -127,7 +127,7 @@ Had you been building on a Windows machine, the host platform would be **_win** 
 
 Assuming you are building phorton1/chromaprint next, this directory structure is not important for you to know, but it is used by, and known by that repository's build mechanism, and is presented here for completeness.
 
-#### example: configure and build for Windows and Linux (host)
+#### b. example: configure and build for Windows and Linux (host)
 
 ```bash
     cd /blah/fpcalc/ffmpeg
@@ -139,7 +139,7 @@ Assuming you are building phorton1/chromaprint next, this directory structure is
 In a Linux build environment, this will build the libraries needed by phorton1/chromaprint for building the Windows fpcalc.exe and Linux (host) fpcalc executables.
 
 
-#### example: configure and build for all target platforms
+#### c. example: configure and build for all target platforms
 
 *These are the commands that I personally use most when building with this repository*
 
