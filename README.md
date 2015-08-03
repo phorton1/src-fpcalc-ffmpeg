@@ -3,7 +3,7 @@ phorton1/ffmpeg
 
 ## Contents
 
-This repository contains the source code, scripts, and makefiles to build specific **stripped** versions of **ffmpeg** *archive libraries* suitable for linking fpCalc executables and Android shared libraries as desribed in the bitbucket phorton1/chromaprint repository.  This project generally **works with** that repository to build specific platforms and versions of fpCalc executables and Android shared libraries.  It is **not** intended to build ffmpeg libraries for general use, though it could *easily be modified* to do so.
+This repository contains the source code, scripts, and makefiles to build specific **stripped** versions of **ffmpeg** *archive libraries* suitable for linking fpCalc executables and Android shared libraries as described in the bitbucket phorton1/chromaprint repository.  This project generally **works with** that repository to build specific platforms and versions of fpCalc executables and Android shared libraries.  It is **not** intended to build ffmpeg libraries for general use, though it could *easily be modified* to do so.
 
 
 This repository is capable of building (at least) the following four specific **versions** of ffmpeg:
@@ -23,9 +23,9 @@ for the following **target platforms**:
 
 The build mechanism presented in this repository has been tested on Linux (x86 Ubuntu 12.04) and Windows 8 **hosts**. That is to say, that the above versions of ffmpeg can generally be *built* on either Linux or Windows, the exception being that the Linux ffmpeg *archive libraries* can *only* be built on a Linux host ... they are not built on a Windows machine with this system.
 
-This build system *should* work on any platform that presents a bash shell and which provides a gcc-like developement environment. It should be fairly straightfoward to modify it to inncorporate additional specific platforms (i.e. mips, OSX, etc).
+This build system *should* work on any platform that presents a bash shell and which provides a gcc-like development environment. It should be fairly straightforward to modify it to incorporate additional specific platforms (i.e. mips, OSX, etc).
 
-In general this (these) project(s) utilize **out of tree** builds, so that you can maintain builds for  *ALL* of the above configurations simultaneously if you desire.  In fact, it is possible to set up a machine to host both Windows (cgywin) and Ubuntu (vbox) development environments, and to **share this repository** between them, so that there is a single source tree, and single result tree, and yet you can maintain builds for **ALL** of the above versions on **both** Linux and Windows hosts simultaneosly.
+In general this (these) project(s) utilize **out of tree** builds, so that you can maintain builds for  *ALL* of the above configurations simultaneously if you desire.  In fact, it is possible to set up a machine to host both Windows (cgywin) and Ubuntu (vbox) development environments, and to **share this repository** between them, so that there is a single source tree, and single result tree, and yet you can maintain builds for **ALL** of the above versions on **both** Linux and Windows hosts simultaneously.
 
 
 ## Configuring and Building
