@@ -77,6 +77,11 @@ VBOX_SHARED_FOLDER=1
 # ffmpeg version 2.7, I am just disabling yasm for now, to get my test
 # suite to run all the way through once.
 
+# to build ffmpeg.exe, filters are necessary
+#
+#    --disable-ffmpeg
+#    --disable-avfilter
+
 STD_CONFIG="
     --enable-static
     --disable-shared
@@ -84,12 +89,12 @@ STD_CONFIG="
     --disable-txtpages
     --disable-iconv
 
+    --enable-ffmpeg
+    
     --enable-memalign-hack
     --enable-debug
     --disable-avdevice
-    --disable-avfilter
     --disable-swscale
-    --disable-ffmpeg
     --disable-ffplay
     --disable-ffserver
     --disable-network
