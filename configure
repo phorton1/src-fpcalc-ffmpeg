@@ -664,8 +664,10 @@ is_in(){
 
 
 # debug dependencies
-#
-# in_ff_check=""
+
+in_ff_check=""
+check_this="prh_this_wont_match"
+
 
 do_check_deps(){
     for cfg; do
@@ -683,24 +685,25 @@ do_check_deps(){
         eval dep_ifa="\$${cfg}_if"
         eval dep_ifn="\$${cfg}_if_any"
 
-        # debug dependencies
-        #
-        # if test "${cfg}" = "ffmpeg"; then
-        #     in_ff_check="yes"
-        # fi
-        # 
-        # if test "${in_ff_check}" = "yes"; then
-        #     echo
-        #     echo do_check_deps ${cfg}
-        #     echo dep_all=${dep_all}
-        #     echo dep_any=${dep_any}
-        #     echo dep_sel=${dep_sel}
-        #     echo dep_sqs=${dep_sqs}
-        #     echo dep_ifa=${dep_ifa}
-        #     echo dep_ifn=${dep_ifn}
-        #     echo
-        #     echo
-        # fi
+       # debug dependencies
+       
+       if test "${cfg}" = "${check_this}"; then
+           echo starting ${cfg}
+           in_ff_check="yes"
+       fi
+       
+       if test "${in_ff_check}" = "yes"; then
+           echo
+           echo do_check_deps ${cfg}
+           echo dep_all=${dep_all}
+           echo dep_any=${dep_any}
+           echo dep_sel=${dep_sel}
+           echo dep_sqs=${dep_sqs}
+           echo dep_ifa=${dep_ifa}
+           echo dep_ifn=${dep_ifn}
+           echo
+           echo
+       fi
         
         pushvar cfg dep_all dep_any dep_sel dep_sgs dep_ifa dep_ifn
         do_check_deps $dep_all $dep_any $dep_sel $dep_sgs $dep_ifa $dep_ifn
@@ -720,10 +723,10 @@ do_check_deps(){
         disable ${cfg}_checking
         
         # debug dependencies
-        #
-        # if test "${cfg}" = "ffmpeg"; then
-        #     in_ff_check=1
-        # fi
+        
+        if test "${cfg}" = "${check_this}"; then
+            in_ff_check=1
+        fi
         
     done
 }

@@ -77,10 +77,60 @@ VBOX_SHARED_FOLDER=1
 # ffmpeg version 2.7, I am just disabling yasm for now, to get my test
 # suite to run all the way through once.
 
-# to build ffmpeg.exe, filters are necessary
+
+# 2016-04-16 changes for artisan
+# None of this should affect fpcalc
+#---------------------------------------
+# OPTIMIZED BUILD
+#---------------------------------------
+# To build FFMPEG, avfilter and the 
+# specific enabled filters are necessary,
+# so need to Remove:
 #
 #    --disable-ffmpeg
 #    --disable-avfilter
+#
+# and Add:
+#
+#    --enable-filter=aformat
+#    --enable-filter=anull
+#    --enable-filter=atrim
+#    --enable-filter=format
+#    --enable-filter=null
+#    --enable-filter=setpts
+#    --enable-filter=trim
+#
+#---------------------------------------
+# To work from an HTTP stream we changed
+# and added:
+#
+#    --disable-network
+#    --protocol=http
+#
+#---------------------------------------
+# To work withspecific PCM_S16LE encoder,
+# which works with default params
+# "ffmpeg -i blah.wma output.wav"
+#
+#    --enable-encoder=pcm_s16le
+#    --enable-muxer=wav
+#    --enable-filter=aresample
+#
+#-----------------------------------------
+# UNOPTIMIZED BUILD
+#-----------------------------------------
+# Or, to build with all available Encoders
+# (including video), filters, and muxers,
+# just remove the following lines, and do
+# the default build of all native things,
+# fpcalc be damned:
+#
+#    --disable-ffmpeg
+#    --disable-avfilter
+#    --disable-muxers
+#    --disable-encoders
+#    --disable-filters
+
 
 STD_CONFIG="
     --enable-static
@@ -89,18 +139,16 @@ STD_CONFIG="
     --disable-txtpages
     --disable-iconv
 
-    --enable-ffmpeg
-    
     --enable-memalign-hack
     --enable-debug
     --disable-avdevice
     --disable-swscale
     --disable-ffplay
     --disable-ffserver
-    --disable-network
-    --disable-muxers
-    --disable-demuxers
+
     --enable-rdft
+
+    --disable-demuxers
     --enable-demuxer=aac
     --enable-demuxer=ac3
     --enable-demuxer=ape
@@ -115,17 +163,37 @@ STD_CONFIG="
     --enable-demuxer=tta
     --enable-demuxer=wav
     --enable-demuxer=wv
+    
+    --disable-filters    
+    --enable-filter=aformat
+    --enable-filter=anull
+    --enable-filter=atrim
+    --enable-filter=format
+    --enable-filter=null
+    --enable-filter=setpts
+    --enable-filter=trim
+    
+    --disable-muxers
+    --disable-encoders    
+    --enable-encoder=pcm_s16le
+    --enable-muxer=wav
+    --enable-filter=aresample
+
     --disable-bsfs
-    --disable-filters
     --disable-parsers
     --enable-parser=aac
     --enable-parser=ac3
     --enable-parser=mpegaudio
+    
     --disable-protocols
     --enable-protocol=file
+
+    --enable-network
+    --enable-protocol=http
+
     --disable-indevs
     --disable-outdevs
-    --disable-encoders
+   
     --disable-decoders
     --enable-decoder=aac
     --enable-decoder=ac3
