@@ -46,38 +46,63 @@ VBOX_SHARED_FOLDER=1
     # Protocol Error and symlinked makefile problems.
 
 
-# These are the same flags as Lukas Lalinsky's stripped
+# 2016-04-16 changes for artisan
+#---------------------------------------
+# FFMPEG BUILD
+#---------------------------------------
+# By default, FFMPEG, the libraries it depends on,
+# all native filters, muxers, and encoders are built.
+# I use ffmpeg to access HTTP files, so WITH_NETWORK,
+# and not -disable-network, has to be included for me.
+# This impacts the Chromaprint build which must use
+# specific flags (-lw_32s) to link WinSock on windows
+
+WITH_HTTP="
+    --enable-protocol=http"
+
+# This macro sets up for optimized FFMPEG build
+
+OPTIMIZED_FFMPEG="
+     --disable-encoders
+     --disable-filters    
+     --disable-muxers"
+    
+# if building an OPTIMIZED version of ffmpeg
+# that contains only FFMPEG and the minimum
+# needed encoders, include this:
+
+FFMPEG_FILTERS="
+    --disable-filters    
+    --enable-filter=aformat
+    --enable-filter=anull
+    --enable-filter=atrim
+    --enable-filter=format
+    --enable-filter=null
+    --enable-filter=setpts
+    --enable-filter=trim
+    --enable-filter=buffer
+    --enable-filter=buffersink"
+    # buffer and buffersink are specific to 0.9
+
+
+# If building an optimized WAV (pcm) codec
+# which works with default params
+#    "ffmpeg -i blah.wma output.wav"
+# this causes the build to include the minimum
+# signed little endian 16 bit PCM encoder, muxer
+# and a dependency
+
+OPTIMIZED_PCM="
+    --disable-encoders
+    --enable-encoder=pcm_s16le
+    --enable-muxer=wav
+    --enable-filter=aresample"
+
+# These are the same basic flags as Lukas Lalinsky's stripped
 # ffmpeg configuration, from ffmpeg-configure-mingw32.sh,
 # from his guide on how to compile chromaprint for windows
 
-# The multi-2.7/_linux/win build was crashing, related to AVX2_EXTERNAL.
-# It also crashes in multi-tip == 2.7+/2.8dev
-#
-# I traced the crash thru chromaprint, into ffmpeg/libavcode/x86/fft_init.c,
-# where it assigns AVX2_EXTERNAL on the working _win build, but not
-# on the crashing _linux build.  The net result is that fft.asm is
-# assembled differently in the two cases, and the only reason that
-# AVX2_EXTERNAL is false on the _linux build is that the _linux ndk
-# version of yasm apparently does not support "vextracti128 xmm0, ymm0, 0".
-#
-# At that point, I basically had three choices:
-#
-#     (1) follow the branch in ffmpeg and see if I can figure out why
-#     it is crashing, and the "proper" fix to the assembly code.
-#
-#     (2) figure out why the yasm in the two ndk's is different.
-#     I guess they must be since they were built to run on different
-#     platforms. Then what, replace the "bad" on in the ndk?
-#
-#     (3) --disable-yasm on the _linux/win build ... and it worked.
-#     Which implies that there is a bug, more or less, in the assembly
-#     code when AVX2_EXTERNAL is false, and everything else is the same.
-#
-# Since it is not my goal to produce reference builds of fpcalc based on
-# ffmpeg version 2.7, I am just disabling yasm for now, to get my test
-# suite to run all the way through once.
-
-STD_CONFIG="
+BASE_CONFIG="
     --enable-static
     --disable-shared
     --disable-doc
@@ -87,15 +112,14 @@ STD_CONFIG="
     --enable-memalign-hack
     --enable-debug
     --disable-avdevice
-    --disable-avfilter
-    --disable-swscale
-    --disable-ffmpeg
     --disable-ffplay
     --disable-ffserver
-    --disable-network
-    --disable-muxers
-    --disable-demuxers
+
+    --disable-protocols
+    --enable-protocol=file
+    
     --enable-rdft
+    --disable-demuxers
     --enable-demuxer=aac
     --enable-demuxer=ac3
     --enable-demuxer=ape
@@ -110,17 +134,17 @@ STD_CONFIG="
     --enable-demuxer=tta
     --enable-demuxer=wav
     --enable-demuxer=wv
+    
     --disable-bsfs
-    --disable-filters
+
     --disable-parsers
     --enable-parser=aac
     --enable-parser=ac3
     --enable-parser=mpegaudio
-    --disable-protocols
-    --enable-protocol=file
+
     --disable-indevs
     --disable-outdevs
-    --disable-encoders
+
     --disable-decoders
     --enable-decoder=aac
     --enable-decoder=ac3
@@ -158,6 +182,81 @@ STD_CONFIG="
     --enable-decoder=pcm_u24le
     --enable-decoder=rawvideo"
 
+#---------------------
+# USE ONE OF THESE
+#---------------------
+# Don't include ffmpeg
+# swscale is specific to 0.09
+
+NO_FFMPEG="
+    --disable-ffmpeg
+    --disable-avfilter
+    --disable-network
+    --disable-swscale
+    $OPTIMIZED_FFMPEG
+    $BASE_CONFIG"
+
+# Full ffmpeg build
+# Specific demuxers are necessary for certain codecs
+# included in the native build, and since I disabled
+# them, I have to explicitly re-enable them. It was
+# easier to just disable g273_1 than to figure out
+# what it needed .... --enable-demuxer=g723_1
+# and h263, flv on multi-tip
+
+
+FULL_FFMPEG_CONFIG="
+    $BASE_CONFIG
+    $WITH_HTTP
+    --enable-demuxer=adx
+    --disable-encoder=g723_1
+    --disable-muxer=g723_1
+    --disable-encoder=flv
+    --disable-muxer=flv
+    --disable-encoder=h263
+    --disable-muxer=h263"
+
+# optimized PCM/WAV encoder
+
+OPTIMIZED_PCM_CONFIG="
+    $BASE_CONFIG
+    $OPTIMIZED_FFMPEG
+    $FFMPEG_FILTERS
+    $OPTIMIZED_PCM
+    $WITH_HTTP"
+
+
+# try a full native build with almost everything
+# except protocols and parsers
+
+FULL_DAMNED_CONFIG="
+    --enable-static
+    --disable-shared
+    --disable-doc
+    --disable-txtpages
+    --disable-iconv
+    --enable-memalign-hack
+    --enable-debug
+    --disable-avdevice
+    --disable-ffplay
+    --disable-ffserver
+    --disable-bsfs
+    --disable-indevs
+    --disable-outdevs
+    
+    --disable-protocols
+    --enable-protocol=file
+    --enable-protocol=http
+    
+    --disable-parsers
+    --enable-parser=aac
+    --enable-parser=ac3
+    --enable-parser=mpegaudio"
+
+
+#---------------------------------------
+# configure_one
+#---------------------------------------
 
 function configure_one
     # param1 = the build to perform.
@@ -186,9 +285,25 @@ function configure_one
     echo "CONFIGURATION: --prefix=$PREFIX $@" $INSTALL_CFG
     echo
 
+    # I only use FFMPEG encoding (currently) on x86 emulators
+    # to play WMA files, so it is not needed for any other build
+    
+    echo
+    USE_CONFIG=$NO_FFMPEG
+    if [ "$WHICH" == "x86" ]
+    then
+        USE_CONFIG=$FULL_DAMNED_CONFIG
+        echo Building with full FULL_DAMNED_CONFIG
+    else
+        echo Building without FFMPEG
+    fi
+    echo $USE_CONFIG
+    echo
+    echo
+    
     # do the actual configuration.
 
-    $START_DIR/configure --prefix=$PREFIX "$@" $INSTALL_CFG $STD_CONFIG
+    $START_DIR/configure --prefix=$PREFIX "$@" $INSTALL_CFG $USE_CONFIG
 
     if [ $? -ne 0 ]
     then
