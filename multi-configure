@@ -254,6 +254,36 @@ OPTIMIZED_PCM_CONFIG="
     $WITH_HTTP"
 
 
+# FULL_DAMNED_CONFIG builds almost everything
+# except for parsers, protocols, and devices ..
+# Seems as though I am tending to 2.7 Full
+# as the new standard for Artisan fpCalc
+# and ffMpeg.
+
+FULL_DAMNED_CONFIG="
+    --enable-static
+    --disable-shared
+    --disable-doc
+    --disable-txtpages
+    --disable-iconv
+    --enable-memalign-hack
+    --enable-debug
+    --disable-avdevice
+    --disable-ffplay
+    --disable-ffserver
+    --disable-bsfs
+    --disable-indevs
+    --disable-outdevs
+    
+    --disable-protocols
+    --enable-protocol=file
+    --enable-protocol=http
+    
+    --disable-parsers
+    --enable-parser=aac
+    --enable-parser=ac3
+    --enable-parser=mpegaudio"
+
 #---------------------------------------
 # configure_one
 #---------------------------------------
@@ -293,8 +323,8 @@ function configure_one
     USE_CONFIG=$NO_FFMPEG
     if [ "$WHICH" == "x86" ]
     then
-        USE_CONFIG=$FULL_FFMPEG_CONFIG
-        echo Building with full FFMPEG
+        USE_CONFIG=$FULL_DAMNED_CONFIG
+        echo Building with full FULL_DAMNED_CONFIG
     else
         echo Building without FFMPEG
     fi
